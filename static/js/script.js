@@ -32,7 +32,7 @@ function renderCocktails(cocktails) {
     cocktails.forEach(cocktail => {
         const cocktailCard = `
                 <div class="col-md-4 mb-4">
-                    <div class="texas border-secondary " >
+                    <div class="texas border-secondary border-0" >
                         <img src="${cocktail.strDrinkThumb}" class="card-img-top" alt="${cocktail.strDrink}"onclick="showCocktailDetails('${cocktail.idDrink}')">
                         <div class="texas-body">
                             <h5 class="texas-title">${cocktail.strDrink}</h5>
