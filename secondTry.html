@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cocktail Search App</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container mt-5">
+    <h1 class="text-center mb-4">Cocktail Search</h1>
+    <div class="form-group">
+        <form id="searchCock">
+            <input type="text" class="form-control" placeholder="Search cocktails..." name="cocktail">
+            <button type="submit" id="searchCocktail" class="btn btn-primary mt-3">Search</button>
+        </form>
+    </div>
+    <div id="cocktailResults" class="row mt-5"></div>
+    <div id="errorContainer" style="color: red;"></div>
+</div>
+
+<script src="static/js/script.js"></script>
+</body>
+</html>
