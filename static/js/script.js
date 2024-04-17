@@ -51,13 +51,53 @@ async function showCocktailDetails(cocktailId) {
         const data = await response.json();
 
         const cocktail = data.drinks[0];
+        let ingredients = await ingredientsList(cocktail);
+        let size = ingredients.length;
 
-        // Display modal or more detailed information
-        alert(`Name: ${cocktail.strDrink}\nCategory: ${cocktail.strCategory}\nGlass: ${cocktail.strGlass}\nInstructions: ${cocktail.strInstructions}`);
+
+        const modalContent = `
+            <p><strong>Name:</strong> ${cocktail.strDrink}</p>
+            <p><strong>Category:</strong> ${cocktail.strCategory}</p>
+            <p><strong>Alcoholic:</strong> ${cocktail.strAlcoholic}</p>
+            <p><strong>Instructions:</strong> ${cocktail.strInstructions}</p>
+            <p><strong>Ingredients:</strong></p>
+            <ul>
+            <list>
+            ${ingredients}</list></ul>
+     
+        `;
+
+        const modalBody = document.getElementById('cocktailModalBody');
+        modalBody.innerHTML = modalContent;
+
+        // Show the modal
+        $('#cocktailModal').modal('show');
+
     } catch (error) {
         console.error('Error fetching cocktail details:', error);
     }
 }
+
+async function ingredientsList(cocktail) {
+    let ingredientsHTML = '';
+
+    for (let i = 1; i <= 15; i++) {
+        const ingredientKey = `strIngredient${i}`;
+        const measureKey = `strMeasure${i}`;
+
+        if (cocktail[ingredientKey]) {
+            const ingredient = cocktail[ingredientKey];
+            const measure = cocktail[measureKey];
+
+            ingredientsHTML += `<li>${ingredient} - ${measure}</li>`;
+        } else {
+            break;
+        }
+    }
+
+    return ingredientsHTML;
+}
+
 
 form.addEventListener('submit', search);
 
