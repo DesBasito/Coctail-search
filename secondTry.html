@@ -8,16 +8,27 @@
     <link rel="stylesheet" href="static/secondTry.css">
 </head>
 <body>
-<div class="modal fade" id="cocktailModal" tabindex="-1" role="dialog" aria-labelledby="cocktailModalLabel" aria-hidden="true">
+<header>
+    <nav class="navbar navbar-light bg-secondary" style="padding: 20px">
+        <div class=" container">
+            <a class="navbar-brand ">Cocktail search</a>
+        </div>
+    </nav>
+</header>
+<div class="modal fade" id="detailModal" tabindex="-1" role="dialog" aria-labelledby="detailModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-scrollable" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="cocktailModalLabel">Cocktail Details</h5>
+                <h5 class="modal-title" id="detailModalLabel">Details</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <div class="modal-body" id="cocktailModalBody">
+            <div class="modal-body" id="detailModalBody">
+                <!-- Dynamic content will be placed here -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
             </div>
         </div>
     </div>
@@ -25,12 +36,13 @@
 
 
 
+
+
 <div class="container mt-5">
-    <h1 class="text-center mb-4">Cocktail Search</h1>
     <div class="form-group">
-        <form id="searchCock">
-            <input type="text" class="form-control" placeholder="Search cocktails..." name="cocktail">
-            <button type="submit" id="searchCocktail" class="btn btn-primary mt-3">Search</button>
+        <form id="searchCock" class="d-flex my-3">
+            <input class="form-control me-2 w-25" type="search" placeholder="Search" aria-label="Search" name="cocktail">
+            <button class="btn btn-outline-success mx-2" id="searchCocktail" type="submit">Search</button>
         </form>
     </div>
     <div id="cocktailResults" class="row mt-5"></div>
