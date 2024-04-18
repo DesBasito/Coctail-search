@@ -90,36 +90,6 @@ function renderCocktails(cocktails) {
     });
 }
 
-async function showCocktailDetails(cocktailId) {
-    try {
-        const response = await fetch(`https://www.thecocktaildb.com/api/json/v1/1/lookup.php?i=${cocktailId}`);
-        const data = await response.json();
-
-        const cocktail = data.drinks[0];
-        let ingredients = await ingredientsList(cocktail);
-        let size = ingredients.length;
-
-
-        const modalContent = `
-            <p><strong>Ingredients:</strong> <br></p>
-            ${ingredients}     
-            <p><strong>Name:</strong> ${cocktail.strDrink}</p>
-            <p><strong>Category:</strong> ${cocktail.strCategory}</p>
-            <p><strong>Alcoholic:</strong> ${cocktail.strAlcoholic}</p>
-            <p><strong>Instructions:</strong> ${cocktail.strInstructions}</p>
-        `;
-
-        const modalBody = document.getElementById('cocktailModalBody');
-        modalBody.innerHTML = modalContent;
-
-        // Show the modal
-        $('#cocktailModal').modal('show');
-
-    } catch (error) {
-        console.error('Error fetching cocktail details:', error);
-    }
-}
-
 async function ingredientsList(cocktail) {
     let ingredientsHTML = '';
 
@@ -131,32 +101,15 @@ async function ingredientsList(cocktail) {
             const ingredient = cocktail[ingredientKey];
             const measure = cocktail[measureKey];
 
-            const imageUrl = `https://www.thecocktaildb.com/images/ingredients/${encodeURIComponent(ingredient)}-Small.png`;
-
-            try {
-                const imageResponse = await fetch(imageUrl);
-
-                if (imageResponse.ok) {
-                    const imageBlob = await imageResponse.blob();
-                    const imageSrc = URL.createObjectURL(imageBlob);
-
-                    ingredientsHTML += `
-                        <div class="row align-items-center mb-2">
-                            <div class="col-auto pr-3">
-                                <img src="${imageSrc}" class="ingredientBorder" style="width: 60px" alt="${ingredient}">
-                            </div>
-                            <div class="col">
-                                <div>${ingredient} (${measure})</div>
-                            </div>
-                        </div>`;
-                } else {
-                    ingredientsHTML += `<div>${ingredient} (${measure})</div>`;
-                    console.log(`Failed to fetch image for ${ingredient}`);
-                }
-            } catch (error) {
-                console.error(`Error fetching image for ${ingredient}:`, error);
-                ingredientsHTML += `<div>${ingredient} (${measure})</div>`;
-            }
+            ingredientsHTML += `
+                <div class="row align-items-center mb-2" style="cursor: pointer;" onclick="showIngredientDetails('${encodeURIComponent(ingredient)}')">
+                    <div class="col-auto pr-3">
+                        <img src="https://www.thecocktaildb.com/images/ingredients/${encodeURIComponent(ingredient)}-Small.png" class="ingredientBorder" style="width: 60px" alt="${ingredient}">
+                    </div>
+                    <div class="col">
+                        <div>${ingredient} (${measure})</div>
+                    </div>
+                </div>`;
         } else {
             break;
         }
@@ -164,6 +117,74 @@ async function ingredientsList(cocktail) {
 
     return ingredientsHTML;
 }
+
+async function showCocktailDetails(cocktailId) {
+    try {
+        const response = await fetch(`https://www.thecocktaildb.com/api/json/v1/1/lookup.php?i=${cocktailId}`);
+        const data = await response.json();
+        const cocktail = data.drinks[0];
+        showDetails('cocktail', cocktail);
+    } catch (error) {
+        console.error('Error fetching cocktail details:', error);
+    }
+}
+
+async function showIngredientDetails(ingredientName) {
+    try {
+        const response = await fetch(`https://www.thecocktaildb.com/api/json/v1/1/search.php?i=${ingredientName}`);
+        const data = await response.json();
+        const ingredient = data.ingredients[0];
+        showDetails('ingredient', ingredient);
+    } catch (error) {
+        console.error('Error fetching ingredient details:', error);
+    }
+}
+async function showDetails(type, data) {
+    const modalTitle = document.getElementById('detailModalLabel');
+    const modalBody = document.getElementById('detailModalBody');
+    const modalFooter = document.querySelector('#detailModal .modal-footer');
+
+    if (type === 'cocktail') {
+        modalTitle.textContent = 'Cocktail Details';
+        modalBody.innerHTML = `
+            <img src="${data.strDrinkThumb}" style="width: 430px;">
+            <p><strong>Name:</strong> ${data.strDrink}</p>
+            <p><strong>Category:</strong> ${data.strCategory}</p>
+            <p><strong>Alcoholic:</strong> ${data.strAlcoholic}</p>
+            <p><strong>Instructions:</strong> ${data.strInstructions}</p>
+            <p><strong>Ingredients:</strong> <br></p>
+            ${await ingredientsList(data)}
+        `;
+        // Remove the 'Search by Ingredient' button from the modal footer
+        modalFooter.innerHTML = `
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        `;
+    } else if (type === 'ingredient') {
+        modalTitle.textContent = 'Ingredient Details';
+        modalBody.innerHTML = `
+            <img src="https://www.thecocktaildb.com/images/ingredients/${encodeURIComponent(data.strIngredient)}-Small.png" style="width: 100px; height: 100px;" class="rounded-circle">
+            <p><strong>Name:</strong> ${data.strIngredient}</p>
+            <p><strong>Type:</strong> ${data.strType || '-'}</p>
+            <p><strong>Description:</strong> ${data.strDescription || '-'}</p>
+        `;
+        // Add the 'Search by Ingredient' button to the modal footer
+        modalFooter.innerHTML = `
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary" id="searchByIngredient">Search by Ingredient</button>
+        `;
+        // Attach event listener to the 'Search by Ingredient' button
+        const searchByIngredientBtn = document.getElementById('searchByIngredient');
+        searchByIngredientBtn.addEventListener('click', () => {
+            $('#detailModal').modal('hide');
+            form.querySelector('input[name="cocktail"]').value = data.strIngredient;
+            search(new Event('submit'));
+        });
+    }
+
+    $('#detailModal').modal('show');
+}
+
+
 
 
 form.addEventListener('submit', search);
