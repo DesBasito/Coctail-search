@@ -14,16 +14,51 @@ async function search(event) {
     }
     try {
         const response = await fetch(`https://www.thecocktaildb.com/api/json/v1/1/search.php?s=${searchTerm}`);
-        const data = await response.json();
+        const responseByIngredients = await fetch(`https://www.thecocktaildb.com/api/json/v1/1/filter.php?i=${searchTerm}`);
 
-        if (data.drinks) {
-            renderCocktails(data.drinks);
+        const data = await response.json();
+        console.log(data)
+        const dataByIng = await responseByIngredients.json();
+
+        const drinks1 = data.drinks || [];
+        const drinks2 = dataByIng.drinks || [];
+
+        const idSet = new Set();
+        const uniqueDrinks = [];
+
+        // Function to add unique drinks to the list
+        const addUniqueDrinks = (drinks) => {
+            drinks.forEach((drink) => {
+                if (!idSet.has(drink.idDrink)) {
+                    idSet.add(drink.idDrink);
+                    uniqueDrinks.push(drink);
+                }
+            });
+        };
+
+        // Add drinks from both responses
+        addUniqueDrinks(drinks1);
+        addUniqueDrinks(drinks2);
+
+        // If no unique cocktails found based on ingredients, search by name
+        if (uniqueDrinks.length === 0) {
+            const nameSearchResponse = await fetch(`https://www.thecocktaildb.com/api/json/v1/1/search.php?s=${searchTerm}`);
+            const dataByName = await nameSearchResponse.json();
+
+            const drinksByName = dataByName.drinks || [];
+            addUniqueDrinks(drinksByName);
+        }
+
+        // Render cocktails or display message if no cocktails found
+        if (uniqueDrinks.length > 0) {
+            renderCocktails(uniqueDrinks);
         } else {
-            cocktailResults.innerHTML = '<p>No cocktails found.</p>';
+            cocktailResults.innerHTML = '<p>No unique cocktails found.</p>';
         }
     } catch (error) {
         console.error('Error fetching data:', error);
     }
+
 }
 
 function renderCocktails(cocktails) {
@@ -36,7 +71,6 @@ function renderCocktails(cocktails) {
                         <img src="${cocktail.strDrinkThumb}" class="card-img-top" alt="${cocktail.strDrink}"onclick="showCocktailDetails('${cocktail.idDrink}')">
                         <div class="texas-body">
                             <h5 class="texas-title">${cocktail.strDrink}</h5>
-     
                         </div>
                     </div>
                 </div>
@@ -56,15 +90,12 @@ async function showCocktailDetails(cocktailId) {
 
 
         const modalContent = `
+            <p><strong>Ingredients:</strong> <br></p>
+            ${ingredients}     
             <p><strong>Name:</strong> ${cocktail.strDrink}</p>
             <p><strong>Category:</strong> ${cocktail.strCategory}</p>
             <p><strong>Alcoholic:</strong> ${cocktail.strAlcoholic}</p>
             <p><strong>Instructions:</strong> ${cocktail.strInstructions}</p>
-            <p><strong>Ingredients:</strong></p>
-            <ul>
-            <list>
-            ${ingredients}</list></ul>
-     
         `;
 
         const modalBody = document.getElementById('cocktailModalBody');
@@ -89,7 +120,32 @@ async function ingredientsList(cocktail) {
             const ingredient = cocktail[ingredientKey];
             const measure = cocktail[measureKey];
 
-            ingredientsHTML += `<li>${ingredient} - ${measure}</li>`;
+            const imageUrl = `https://www.thecocktaildb.com/images/ingredients/${encodeURIComponent(ingredient)}-Small.png`;
+
+            try {
+                const imageResponse = await fetch(imageUrl);
+
+                if (imageResponse.ok) {
+                    const imageBlob = await imageResponse.blob();
+                    const imageSrc = URL.createObjectURL(imageBlob);
+
+                    ingredientsHTML += `
+                        <div class="row align-items-center mb-2">
+                            <div class="col-auto pr-3">
+                                <img src="${imageSrc}" class="ingredientBorder" style="width: 60px" alt="${ingredient}">
+                            </div>
+                            <div class="col">
+                                <div>${ingredient} (${measure})</div>
+                            </div>
+                        </div>`;
+                } else {
+                    ingredientsHTML += `<div>${ingredient} (${measure})</div>`;
+                    console.log(`Failed to fetch image for ${ingredient}`);
+                }
+            } catch (error) {
+                console.error(`Error fetching image for ${ingredient}:`, error);
+                ingredientsHTML += `<div>${ingredient} (${measure})</div>`;
+            }
         } else {
             break;
         }
@@ -97,6 +153,7 @@ async function ingredientsList(cocktail) {
 
     return ingredientsHTML;
 }
+
 
 
 form.addEventListener('submit', search);
