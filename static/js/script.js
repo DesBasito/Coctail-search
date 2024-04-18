@@ -155,7 +155,6 @@ async function showDetails(type, data) {
             <p><strong>Ingredients:</strong> <br></p>
             ${await ingredientsList(data)}
         `;
-        // Remove the 'Search by Ingredient' button from the modal footer
         modalFooter.innerHTML = `
             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
         `;
@@ -167,12 +166,10 @@ async function showDetails(type, data) {
             <p><strong>Type:</strong> ${data.strType || '-'}</p>
             <p><strong>Description:</strong> ${data.strDescription || '-'}</p>
         `;
-        // Add the 'Search by Ingredient' button to the modal footer
         modalFooter.innerHTML = `
             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
             <button type="button" class="btn btn-primary" id="searchByIngredient">Search by Ingredient</button>
         `;
-        // Attach event listener to the 'Search by Ingredient' button
         const searchByIngredientBtn = document.getElementById('searchByIngredient');
         searchByIngredientBtn.addEventListener('click', () => {
             $('#detailModal').modal('hide');
