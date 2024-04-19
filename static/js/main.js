@@ -1,17 +1,17 @@
 const cocktailResults = document.getElementById('cocktailResults');
 const form = document.getElementById('searchCock');
-const errorContainer = document.getElementById('errorContainer');
+const searchInput = document.querySelector("[data-search]")
 
+searchInput.addEventListener("input", (e) => {
+    const value = e.target.value.toLowerCase();
+    form.querySelector('input[name="cocktail"]').value = value;
+    search(new Event('input'), value).then(r => new Error().cause);
+});
 
-async function search(event) {
+async function search(event, value) {
     event.preventDefault();
     const formData = new FormData(form);
-    const searchTerm = formData.get('cocktail');
-    errorContainer.textContent = ''
-    if (!searchTerm) {
-        errorContainer.textContent = 'Please enter a search term';
-        return;
-    }
+    let searchTerm = formData.get('cocktail');
     try {
         const response = await fetch(`https://www.thecocktaildb.com/api/json/v1/1/search.php?s=${searchTerm}`);
 
@@ -137,6 +137,7 @@ async function showIngredientDetails(ingredientName) {
         console.error('Error fetching ingredient details:', error);
     }
 }
+
 async function showDetails(type, data) {
     const modalTitle = document.getElementById('detailModalLabel');
     const modalBody = document.getElementById('detailModalBody');
@@ -161,7 +162,7 @@ async function showDetails(type, data) {
         modalBody.innerHTML = `
             <img src="https://www.thecocktaildb.com/images/ingredients/${encodeURIComponent(data.strIngredient)}.png" style="width: 350px;" class="rounded-circle">
             <p><strong>Name:</strong> ${data.strIngredient}</p>
-            <p><strong>Type:</strong> ${data.strType ||'just a regular '+ data.strIngredient}</p>
+            <p><strong>Type:</strong> ${data.strType || 'just a regular ' + data.strIngredient}</p>
             <p><strong>Description:</strong> ${data.strDescription || '-'}</p>
         `;
         modalFooter.innerHTML = `
@@ -173,14 +174,12 @@ async function showDetails(type, data) {
         searchByIngredientBtn.addEventListener('click', () => {
             $('#detailModal').modal('hide');
             form.querySelector('input[name="cocktail"]').value = data.strIngredient;
-            search(new Event('submit'));
+            search(new Event('search'));
         });
     }
 
     $('#detailModal').modal('show');
 }
-
-
 
 
 form.addEventListener('submit', search);
