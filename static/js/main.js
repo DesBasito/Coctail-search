@@ -16,8 +16,6 @@ async function search(event) {
         const response = await fetch(`https://www.thecocktaildb.com/api/json/v1/1/search.php?s=${searchTerm}`);
 
         const data = await response.json();
-        console.log(data)
-
 
         const drinks1 = data.drinks || [];
         const drinks2 = await byIngredients(searchTerm);
@@ -79,7 +77,7 @@ function renderCocktails(cocktails) {
         const cocktailCard = `
                 <div class="col-md-4 mb-4">
                     <div class="texas border-secondary border-0" >
-                        <img src="${cocktail.strDrinkThumb}" class="card-img-top" alt="${cocktail.strDrink}"onclick="showCocktailDetails('${cocktail.idDrink}')">
+                        <img src="${cocktail.strDrinkThumb}" class="card-img-top" alt="${cocktail.strDrink}" style="cursor: pointer" onclick="showCocktailDetails('${cocktail.idDrink}')">
                         <div class="texas-body">
                             <h5 class="texas-title">${cocktail.strDrink}</h5>
                         </div>
@@ -102,9 +100,9 @@ async function ingredientsList(cocktail) {
             const measure = cocktail[measureKey];
 
             ingredientsHTML += `
-                <div class="row align-items-center mb-2" style="cursor: pointer;" onclick="showIngredientDetails('${encodeURIComponent(ingredient)}')">
+                <div class="row align-items-center mb-2">
                     <div class="col-auto pr-3">
-                        <img src="https://www.thecocktaildb.com/images/ingredients/${encodeURIComponent(ingredient)}-Small.png" class="ingredientBorder" style="width: 60px" alt="${ingredient}">
+                        <img src="https://www.thecocktaildb.com/images/ingredients/${encodeURIComponent(ingredient)}-Small.png" class="ingredientBorder" onclick="showIngredientDetails('${encodeURIComponent(ingredient)}')" alt="${ingredient} ">
                     </div>
                     <div class="col">
                         <div>${ingredient} (${measure})</div>
@@ -163,7 +161,7 @@ async function showDetails(type, data) {
         modalBody.innerHTML = `
             <img src="https://www.thecocktaildb.com/images/ingredients/${encodeURIComponent(data.strIngredient)}-Small.png" style="width: 100px; height: 100px;" class="rounded-circle">
             <p><strong>Name:</strong> ${data.strIngredient}</p>
-            <p><strong>Type:</strong> ${data.strType || '-'}</p>
+            <p><strong>Type:</strong> ${data.strType ||'just a regular '+ data.strIngredient}</p>
             <p><strong>Description:</strong> ${data.strDescription || '-'}</p>
         `;
         modalFooter.innerHTML = `
@@ -171,6 +169,7 @@ async function showDetails(type, data) {
             <button type="button" class="btn btn-primary" id="searchByIngredient">Search by Ingredient</button>
         `;
         const searchByIngredientBtn = document.getElementById('searchByIngredient');
+
         searchByIngredientBtn.addEventListener('click', () => {
             $('#detailModal').modal('hide');
             form.querySelector('input[name="cocktail"]').value = data.strIngredient;

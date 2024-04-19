@@ -48,6 +48,13 @@
     padding: 1.5rem;
 }
 
+.ingredientBorder {
+    width: 60px;
+    border: lightgray solid 1px;
+    border-radius: 10%;
+    cursor: pointer;
+}
+
 @media (max-width: 576px) {
     .modal-dialog {
         max-width: 90%;
