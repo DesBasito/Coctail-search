@@ -121,7 +121,7 @@ async function showCocktailDetails(cocktailId) {
         const response = await fetch(`https://www.thecocktaildb.com/api/json/v1/1/lookup.php?i=${cocktailId}`);
         const data = await response.json();
         const cocktail = data.drinks[0];
-        showDetails('cocktail', cocktail);
+        await showDetails('cocktail', cocktail);
     } catch (error) {
         console.error('Error fetching cocktail details:', error);
     }
@@ -132,7 +132,7 @@ async function showIngredientDetails(ingredientName) {
         const response = await fetch(`https://www.thecocktaildb.com/api/json/v1/1/search.php?i=${ingredientName}`);
         const data = await response.json();
         const ingredient = data.ingredients[0];
-        showDetails('ingredient', ingredient);
+        await showDetails('ingredient', ingredient);
     } catch (error) {
         console.error('Error fetching ingredient details:', error);
     }
