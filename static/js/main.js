@@ -159,7 +159,7 @@ async function showDetails(type, data) {
     } else if (type === 'ingredient') {
         modalTitle.textContent = 'Ingredient Details';
         modalBody.innerHTML = `
-            <img src="https://www.thecocktaildb.com/images/ingredients/${encodeURIComponent(data.strIngredient)}-Small.png" style="width: 100px; height: 100px;" class="rounded-circle">
+            <img src="https://www.thecocktaildb.com/images/ingredients/${encodeURIComponent(data.strIngredient)}.png" style="width: 350px;" class="rounded-circle">
             <p><strong>Name:</strong> ${data.strIngredient}</p>
             <p><strong>Type:</strong> ${data.strType ||'just a regular '+ data.strIngredient}</p>
             <p><strong>Description:</strong> ${data.strDescription || '-'}</p>
