@@ -12,6 +12,9 @@ async function search(event, value) {
     event.preventDefault();
     const formData = new FormData(form);
     let searchTerm = formData.get('cocktail');
+    if (!searchTerm) {
+        return;
+    }
     try {
         const response = await fetch(`https://www.thecocktaildb.com/api/json/v1/1/search.php?s=${searchTerm}`);
 
